@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>50关地狱极致坑爹大冒险｜纯按钮闯关</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif}
+:root{
+    --bg-main:#121222;
+    --bg-card:#191938;
+    --bg-level:#202048;
+    --color-text:#ffffff;
+    --color-primary:#00e5ee;
+    --color-danger:#ff2233;
+    --color-warning:#ffdd00;
+}
+.theme-blue{
+    --bg-main:#091b2d;
+    --bg-card:#102a44;
+    --bg-level:#14385a;
+}
+.theme-red{
+    --bg-main:#2b0505;
+    --bg-card:#420909;
+    --bg-level:#570e0e;
+}
+.theme-pink{
+    --bg-main:#301426;
+    --bg-card:#451c37;
+    --bg-level:#5c254a;
+}
+.theme-green{
+    --bg-main:#072214;
+    --bg-card:#0d3520;
+    --bg-level:#13492c;
+}
+.theme-gray{
+    --bg-main:#1f1f1f;
+    --bg-card:#2f2f2f;
+    --bg-level:#3f3f3f;
+}
+body{
+    background:var(--bg-main);
+    color:var(--color-text);
+    min-height:100vh;
+    padding:12px;
+    transition: background 0.4s ease;
+    user-select:none;
+}
+.container{
+    max-width:880px;
+    margin:0 auto;
+}
+.top-bar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
+h1{
+    color:var(--color-danger);
+    text-shadow:0 0 10px var(--color-danger);
+    font-size:22px;
+    cursor:pointer;
+}
+.tool-group{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+.info-panel{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px,1fr));
+    gap:10px;
+    background:var(--bg-card);
+    padding:12px 16px;
+    border-radius:10px;
+    margin-bottom:16px;
+}
+.info-item{
+    text-align:center;
+}
+.level-box{
+    background:var(--bg-level);
+    padding:40px 20px;
+    border-radius:12px;
+    min-height:450px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+}
+.tip{
+    font-size:18px;
+    margin:20px 0;
+    line-height:1.8;
+    text-align:center;
+}
+.btn{
+    padding:13px 24px;
+    margin:12px;
+    border:none;
+    border-radius:6px;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.15s ease;
+}
+.btn-normal{background:var(--color-primary);color:#000;}
+.btn-danger{background:var(--color-danger);color:#fff;}
+.btn-warning{background:var(--color-warning);color:#000;}
+.btn-sm{padding:6px 10px;font-size:13px;}
+.hidden{display:none !important;}
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.9);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+    padding:15px;
+}
+.modal-content{
+    background:var(--bg-card);
+    padding:32px 28px;
+    border-radius:12px;
+    max-width:550px;
+    width:100%;
+    text-align:center;
+}
+.theme-select{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin:10px 0;
+}
+.theme-btn{
+    width:28px;height:28px;border-radius:50%;border:2px solid #fff;cursor:pointer;
+}
+.leaderboard{
+    margin:15px 0;
+    text-align:left;
+    background:rgba(255,255,255,0.07);
+    padding:12px;
+    border-radius:8px;
+}
+.invisible-btn{
+    background:transparent;
+    border:none;
+    position:absolute;
+}
+.blink{
+    animation:blink 0.6s infinite;
+}
+@keyframes blink{
+    0%,100%{opacity:1}
+    50%{opacity:0.1}
+}
+.fake-progress{
+    width:80%;
+    height:12px;
+    background:#333;
+    border-radius:6px;
+    margin:15px auto;
+    overflow:hidden;
+}
+.fake-bar{
+    height:100%;
+    width:75%;
+    background:#00e5ee;
+}
+.admin-input{
+    padding:10px;
+    width:60%;
+    font-size:16px;
+    margin:15px 0;
+    border-radius:6px;
+    border:none;
+    text-align:center;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="top-bar">
+        <h1 id="mainTitle">😈50关地狱极致坑爹大冒险</h1>
+        <div class="tool-group">
+            <button class="btn btn-sm btn-normal" id="bgmToggle">背景音乐开</button>
+            <button class="btn btn-sm btn-normal" id="soundToggle">音效开</button>
+            <button class="btn btn-sm btn-danger" id="resetBtn">重置本次闯关</button>
+        </div>
+    </div>
+
+    <div class="theme-select">
+        <span>切换主题：</span>
+        <div class="theme-btn" style="background:#121222" data-theme="default" title="经典暗黑"></div>
+        <div class="theme-btn" style="background:#091b2d" data-theme="theme-blue" title="深海蓝"></div>
+        <div class="theme-btn" style="background:#2b0505" data-theme="theme-red" title="炼狱红"></div>
+        <div class="theme-btn" style="background:#301426" data-theme="theme-pink" title="暗系粉"></div>
+        <div class="theme-btn" style="background:#072214" data-theme="theme-green" title="森林绿"></div>
+        <div class="theme-btn" style="background:#1f1f1f" data-theme="theme-gray" title="极简灰"></div>
+    </div>
+
+    <div class="info-panel">
+        <div class="info-item">当前关卡：<span id="currentLevel">1</span>/50</div>
+        <div class="info-item">本局失败：<span id="failCount">0</span></div>
+        <div class="info-item">历史最高：<span id="bestRecord">0</span>关</div>
+        <div class="info-item">总翻车次数：<span id="totalFailRecord">0</span></div>
+    </div>
+
+    <div class="leaderboard">
+        <h3>📊本地闯关排行榜</h3>
+        <div id="rankText">暂无闯关记录，开始你的折磨之旅吧！</div>
+    </div>
+
+    <div class="level-box" id="levelBox">
+        <p class="tip" id="levelTip"></p>
+        <div id="btnGroup"></div>
+    </div>
+
+    <!--普通弹窗-->
+    <div class="modal hidden" id="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle"></h2>
+            <p id="modalText" style="margin:22px 0;line-height:1.8"></p>
+            <button class="btn btn-normal" id="modalBtn">确定</button>
+        </div>
+    </div>
+
+    <!--管理员弹窗-->
+    <div class="modal hidden" id="adminModal">
+        <div class="modal-content">
+            <h2>🔧 管理员模式 - 跳关面板</h2>
+            <p>请输入要跳转的关卡(1-50)</p>
+            <input type="number" min="1" max="50" class="admin-input" id="jumpInput" placeholder="输入关卡数字">
+            <div>
+                <button class="btn btn-normal" id="confirmJump">确认跳关</button>
+                <button class="btn btn-warning" id="jumpTo50">直达50关</button>
+                <button class="btn btn-danger" id="resetFail">清空本局失败次数</button>
+                <button class="btn btn-normal" id="closeAdmin">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<audio id="bgmAudio" loop preload="auto">
+<source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+
+<audio id="clickAudio" preload="auto">
+<source src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3" type="audio/mpeg">
+
+<audio id="winAudio" preload="auto">
+<source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+
+<audio id="loseAudio" preload="auto">
+<source src="https://assets.mixkit.co/sfx/preview/mixkit-player-losing-or-failing-2042.mp3" type="audio/mpeg">
+
+<script>
+let currentLevel = 1;
+let failCount = 0;
+const MAX_LEVEL = 50;
+let bgmOn = true;
+let soundOn = true;
+const bgmAudio = document.getElementById('bgmAudio');
+const clickAudio = document.getElementById('clickAudio');
+const winAudio = document.getElementById('winAudio');
+const loseAudio = document.getElementById('loseAudio');
+
+//管理员：无点击间隔，连续点10次开启
+let titleClickCount = 0;
+const ADMIN_NEED_CLICK = 10;
+
+const adminModal = document.getElementById('adminModal');
+const jumpInput = document.getElementById('jumpInput');
+const confirmJumpBtn = document.getElementById('confirmJump');
+const jump50Btn = document.getElementById('jumpTo50');
+const resetFailBtn = document.getElementById('resetFail');
+const closeAdminBtn = document.getElementById('closeAdmin');
+
+function openAdminPanel(){
+    adminModal.classList.remove('hidden');
+    jumpInput.value = currentLevel;
+}
+function closeAdminPanel(){
+    adminModal.classList.add('hidden');
+}
+
+confirmJumpBtn.onclick = function(){
+    const target = parseInt(jumpInput.value);
+    if(!isNaN(target) && target >= 1 && target <= MAX_LEVEL){
+        currentLevel = target;
+        closeAdminPanel();
+        renderLevel();
+        playAudio(winAudio);
+        alert(`已成功跳转到第${target}关`);
+    }else{
+        alert('请输入1-50之间的有效关卡数字');
+    }
+};
+
+jump50Btn.onclick = function(){
+    currentLevel = 50;
+    closeAdminPanel();
+    renderLevel();
+    playAudio(winAudio);
+    alert('已一键直达第50关终极地狱关卡');
+};
+
+resetFailBtn.onclick = function(){
+    failCount = 0;
+    document.getElementById('failCount').textContent = failCount;
+    playAudio(winAudio);
+    alert('本局失败次数已清空');
+};
+
+closeAdminBtn.onclick = closeAdminPanel;
+
+const mainTitle = document.getElementById('mainTitle');
+mainTitle.addEventListener('click', function(){
+    titleClickCount++;
+    if(titleClickCount >= ADMIN_NEED_CLICK){
+        titleClickCount = 0;
+        openAdminPanel();
+    }
+});
+
+function getRankData(){
+    let data = localStorage.getItem('hellKdGame');
+    return data ? JSON.parse(data) : {best:0,totalFail:0,records:[]};
+}
+function saveRankData(obj){
+    localStorage.setItem('hellKdGame',JSON.stringify(obj));
+}
+let rankData = getRankData();
+document.getElementById('bestRecord').textContent = rankData.best;
+document.getElementById('totalFailRecord').textContent = rankData.totalFail;
+
+function renderRank(){
+    const wrap = document.getElementById('rankText');
+    if(rankData.records.length===0){
+        wrap.innerHTML = '暂无闯关记录，每一关都会狠狠折磨你！';
+        return;
+    }
+    let html = '<ol>';
+    rankData.records.slice(-12).reverse().forEach(item=>{
+        html += `<li>闯至第${item.level}关｜本局翻车${item.fail}次</li>`;
+    })
+    html += '</ol>';
+    wrap.innerHTML = html;
+}
+renderRank();
+
+document.querySelectorAll('.theme-btn').forEach(btn=>{
+    btn.onclick = ()=>{
+        document.body.className = btn.dataset.theme === 'default' ? '' : btn.dataset.theme;
+    }
+})
+
+document.getElementById('bgmToggle').onclick = function(){
+    bgmOn = !bgmOn;
+    this.textContent = bgmOn ? '背景音乐开' : '背景音乐关';
+    bgmOn ? bgmAudio.play().catch(()=>{}) : bgmAudio.pause();
+}
+document.getElementById('soundToggle').onclick = function(){
+    soundOn = !soundOn;
+    this.textContent = soundOn ? '音效开' : '音效关';
+}
+function playAudio(audioDom){
+    if(!soundOn) return;
+    audioDom.currentTime = 0;
+    audioDom.play().catch(()=>{});
+}
+
+document.getElementById('resetBtn').onclick = ()=>{
+    if(confirm('重置本局进度，历史排行榜不会清空，确定继续？')){
+        currentLevel = 1;
+        failCount = 0;
+        renderLevel();
+    }
+}
+
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const modalText = document.getElementById('modalText');
+const modalBtn = document.getElementById('modalBtn');
+const levelTip = document.getElementById('levelTip');
+const btnGroup = document.getElementById('btnGroup');
+const levelShow = document.getElementById('currentLevel');
+const failShow = document.getElementById('failCount');
+
+// 全部关卡仅按钮交互，删除所有外部特殊操作
+const levelConfig = [
+//1
+{tip:"第1关：点击蓝色按钮即可直接通关",btns:[
+    {t:"蓝色通关按钮",c:"btn-normal",ok:false,msg:""},
+    {t:"蓝色确认按钮",c:"btn-normal",ok:false,msg:""},
+    {t:"✓",c:"invisible-btn",s:"position:absolute;bottom:15px;left:15px;width:50px;height:50px;font-size:22px;color:#cccccc",ok:true,msg:""}
+]},
+//2
+{tip:"第2关：不要选择文字最长的按钮",btns:[
+    {t:"终极完美通关确认按钮",c:"btn-warning",ok:false,msg:""},
+    {t:"入口",c:"btn-normal",ok:true,msg:""}
+]},
+//3
+{tip:"第3关：三选一，避开文字带通关的按钮",btns:[
+    {t:"快速通关",c:"btn-normal",ok:false,msg:""},
+    {t:"一键过关",c:"btn-danger",ok:false,msg:""},
+    {t:"解锁通道",c:"btn-warning",ok:true,msg:""}
+]},
+//4
+{tip:"第4关：闪烁按钮全是陷阱",btns:[
+    {t:"闪烁极速通关",c:"btn-danger blink",ok:false,msg:""},
+    {t:"正常确认",c:"btn-normal",s:"opacity:0.15",ok:true,msg:""}
+]},
+//5
+{tip:"第5关：连续失败3次刷新正确按钮",btns:[
+    {t:"选项A",c:"btn-normal",ok:false,msg:""},
+    {t:"选项B",c:"btn-danger",ok:false,msg:""}
+],needLevelFail:3},
+//6
+{tip:"第6关：颜色鲜艳按钮全部陷阱",btns:[
+    {t:"红色确认",c:"btn-warning",ok:false,msg:""},
+    {t:"浅灰按钮",c:"btn-normal",ok:true,msg:""}
+]},
+//7
+{tip:"第7关：同色系文字按钮是骗局",btns:[
+    {t:"白色按钮",c:"btn-normal",ok:false,msg:""},
+    {t:"通关",c:"btn-normal",s:"color:#121222",ok:true,msg:""}
+]},
+//8
+{tip:"第8关：大号按钮全是诱饵",btns:[
+    {t:"进度完成通关",c:"btn-normal",ok:false,msg:""},
+    {t:"隐藏小按钮",c:"btn-warning",s:"position:absolute;top:5px;right:5px;padding:3px;font-size:8px",ok:true,msg:""}
+]},
+//9
+{tip:"第9关：红色按钮百分百踩坑",btns:[
+    {t:"一键下一关",c:"btn-danger",ok:false,msg:""},
+    {t:"安全入口",c:"btn-normal",ok:true,msg:""}
+]},
+//10
+{tip:"第10关：千万不要点击写着【不要点击这个按钮】的按键",btns:[
+    {t:"普通通关按钮",c:"btn-normal",ok:false,msg:""},
+    {t:"不要点击这个按钮",c:"btn-warning",ok:true,msg:""}
+]},
+//11
+{tip:"第11关：尺寸最大按钮为陷阱",btns:[
+    {t:"超大安全按钮",c:"btn-normal",ok:false,msg:""},
+    {t:"小型按钮",c:"btn-warning",ok:true,msg:""}
+]},
+//12
+{tip:"第12关：数字密码按钮全部错误",btns:[
+    {t:"提交密码668899",c:"btn-normal",ok:false,msg:""},
+    {t:"空白提交",c:"btn-warning",ok:true,msg:""}
+]},
+//13
+{tip:"第13关：标有确认的按钮全坑",btns:[
+    {t:"确认通关",c:"btn-danger",ok:false,msg:""},
+    {t:"通道",c:"btn-normal",ok:true,msg:""}
+]},
+//14
+{tip:"第14关：双击任意按钮直接失败",btns:[{t:"单击通关",c:"btn-warning",ok:false,msg:""}],doubleClickFail:true},
+//15
+{tip:"第15关：中间巨型按钮是骗局",btns:[
+    {t:"超大居中通关按钮",c:"btn-normal",ok:false,msg:""},
+    {t:"√",c:"btn-warning",s:"position:absolute;bottom:3px;left:3px;padding:2px;font-size:6px",ok:true,msg:""}
+]},
+//16
+{tip:"第16关：亮色按钮陷阱",btns:[
+    {t:"立即过关",c:"btn-normal",ok:false,msg:""},
+    {t:"暗色小按钮",c:"btn-warning",ok:true,msg:""}
+]},
+//17
+{tip:"第17关：带文字描述的按钮全错",btns:[
+    {t:"正确",c:"btn-normal",ok:false,msg:""},
+    {t:"标准答案",c:"btn-danger",ok:false,msg:""},
+    {t:"",c:"invisible-btn",s:"right:5px;bottom:5px;width:25px;height:25px",ok:true,msg:""}
+]},
+//18
+{tip:"第18关：长文字按钮全部陷阱",btns:[
+    {t:"确认提交闯关按钮",c:"btn-warning",ok:false,msg:""},
+    {t:"进入",c:"btn-normal",ok:true,msg:""}
+]},
+//19
+{tip:"第19关：写着下一关的按钮不能点",btns:[
+    {t:"下一关",c:"btn-normal",ok:false,msg:""},
+    {t:"跳转通道",c:"btn-warning",ok:true,msg:""}
+]},
+//20
+{tip:"第20关：前20关失败≥25次才可通关",btns:[
+    {t:"最终通关",c:"btn-warning",ok:false,msg:""},
+    {t:"查看本局翻车统计",c:"btn-normal",ok:true,msg:""}
+],stageFailCheck:25},
+//21
+{tip:"第21关：按钮文字含通字全是陷阱",btns:[
+    {t:"快速通关",c:"btn-normal",ok:false,msg:""},
+    {t:"解锁",c:"btn-warning",ok:true,msg:""}
+]},
+//22
+{tip:"第22关：高亮黄色按钮必坑",btns:[
+    {t:"高亮黄色按钮",c:"btn-warning",ok:false,msg:""},
+    {t:"暗淡按钮",c:"btn-normal",s:"opacity:0.2",ok:true,msg:""}
+]},
+//23
+{tip:"第23关：方形大按钮全部错误",btns:[
+    {t:"大方块确认",c:"btn-danger",ok:false,msg:""},
+    {t:"窄小按钮",c:"btn-normal",ok:true,msg:""}
+]},
+//24
+{tip:"第24关：弹窗提示跳过按钮为陷阱",btns:[
+    {t:"一键跳过",c:"btn-normal",ok:false,msg:""},
+    {t:"正常推进",c:"btn-warning",ok:true,msg:""}
+]},
+//25
+{tip:"第25关：正向文字按钮全错",btns:[
+    {t:"正常文字按钮",c:"btn-normal",ok:false,msg:""},
+    {t:"钮按关通",c:"btn-warning",ok:true,msg:""}
+]},
+//26
+{tip:"第26关：连续快速点击会触发失败",btns:[{t:"连续点击解锁",c:"btn-normal",ok:false,msg:""}],clickInterval:true},
+//27
+{tip:"第27关：大号标题样式按钮陷阱",btns:[
+    {t:"超大通关按钮",c:"btn-danger",ok:false,msg:""},
+    {t:"迷你小字按钮",c:"btn-warning",ok:true,msg:""}
+]},
+//28
+{tip:"第28关：圆角越大越坑",btns:[
+    {t:"按钮1",c:"btn-normal",style:"border-radius:12px",ok:false,msg:""},
+    {t:"按钮2",c:"btn-danger",style:"border-radius:10px",ok:false,msg:""},
+    {t:"按钮3",c:"btn-warning",style:"border-radius:2px",ok:true,msg:""}
+]},
+//29
+{tip:"第29关：单一亮色按钮为陷阱",btns:[
+    {t:"立即通关",c:"btn-normal",ok:false,msg:""},
+    {t:"双色小字按钮",c:"btn-warning",ok:true,msg:""}
+]},
+//30
+{tip:"第30关：每次失败按钮位置随机打乱",btns:[
+    {t:"正确A",c:"btn-normal",ok:false,msg:""},
+    {t:"正确B",c:"btn-danger",ok:false,msg:""},
+    {t:"正确C",c:"btn-warning",ok:true,msg:""}
+],randomBtnPos:true},
+//31
+{tip:"第31关：可拖动外观按钮是骗局",btns:[
+    {t:"可拖拽按钮",c:"btn-normal",ok:false,msg:""},
+    {t:"固定小按钮",c:"btn-warning",ok:true,msg:""}
+]},
+//32
+{tip:"第32关：居中按钮全部陷阱",btns:[
+    {t:"居中通关按钮",c:"btn-warning",ok:false,msg:""},
+    {t:"边角小按钮",c:"btn-normal",ok:true,msg:""}
+]},
+//33
+{tip:"第33关：描述越长坑越深",btns:[
+    {t:"超级终极官方唯一标准答案按钮",c:"btn-normal",ok:false,msg:""},
+    {t:"过",c:"btn-warning",ok:true,msg:""}
+]},
+//34
+{tip:"第34关：红色确认按钮不能点",btns:[
+    {t:"确认下一关",c:"btn-danger",ok:false,msg:""},
+    {t:"灰色通道",c:"btn-normal",ok:true,msg:""}
+]},
+//35
+{tip:"第35关：显眼大按钮全错",btns:[
+    {t:"选项1",c:"btn-normal",ok:false,msg:""},
+    {t:"选项2",c:"btn-danger",ok:false,msg:""},
+    {t:"选项3",c:"btn-normal",ok:false,msg:""},
+    {t:"选项4",c:"btn-warning",ok:false,msg:""},
+    {t:"✓",c:"btn-normal",s:"position:relative;left:-15px;padding:2px",ok:true,msg:""}
+]},
+//36
+{tip:"第36关：带密码字样按钮陷阱",btns:[
+    {t:"随机密码提交",c:"btn-normal",ok:false,msg:""},
+    {t:"无文字按钮",c:"btn-warning",ok:true,msg:""}
+]},
+//37
+{tip:"第37关：发光特效按钮必坑",btns:[
+    {t:"发光按钮",c:"btn-warning",style:"box-shadow:0 0 8px #ffdd00",ok:false,msg:""},
+    {t:"普通按钮",c:"btn-normal",ok:true,msg:""}
+]},
+//38
+{tip:"第38关：写着变色提示的按钮错误",btns:[
+    {t:"变色后通关",c:"btn-normal",ok:false,msg:""},
+    {t:"纯色小按钮",c:"btn-warning",ok:true,msg:""}
+]},
+//39
+{tip:"第39关：一键通关字样按钮陷阱",btns:[
+    {t:"一键通关",c:"btn-danger",ok:false,msg:""},
+    {t:"通行",c:"btn-normal",ok:true,msg:""}
+]},
+//40
+{tip:"第40关：前40关总失败≥40次才可通关",btns:[
+    {t:"直接通关41关",c:"btn-warning",ok:false,msg:""},
+    {t:"查看全局闯关数据",c:"btn-normal",ok:true,msg:""}
+],globalFailCheck:40},
+//41
+{tip:"第41关：宽尺寸按钮全部错误",btns:[
+    {t:"宽幅确认",c:"btn-normal",ok:false,msg:""},
+    {t:"窄条按钮",c:"btn-warning",ok:true,msg:""}
+]},
+//42
+{tip:"第42关：模糊滤镜按钮是陷阱",btns:[
+    {t:"模糊按钮",c:"btn-danger",style:"filter:blur(2px)",ok:false,msg:""},
+    {t:"√",c:"btn-warning",style:"font-size:8px",ok:true,msg:""}
+]},
+//43
+{tip:"第43关：闪烁状态点击直接失败",btns:[{t:"闪烁通关按钮",c:"btn-warning blink",ok:false,msg:""}],blinkPauseClick:true},
+//44
+{tip:"第44关：大号可见按钮全坑",btns:[
+    {t:"可见通关",c:"btn-normal",ok:false,msg:""},
+    {t:"淡色迷你按钮",c:"btn-warning",ok:true,msg:""}
+]},
+//45
+{tip:"第45关：含确认/通关关键词按钮陷阱",btns:[
+    {t:"确认通关",c:"btn-normal",ok:false,msg:""},
+    {t:"解锁入口",c:"btn-warning",ok:true,msg:""}
+]},
+//46
+{tip:"第46关：标有限时的按钮不能点",btns:[
+    {t:"限时通关按钮",c:"btn-danger",ok:false,msg:""},
+    {t:"永久通道",c:"btn-normal",ok:true,msg:""}
+]},
+//47
+{tip:"第47关：单一文字按钮为正确",btns:[
+    {t:"下一关通道按钮",c:"btn-normal",ok:false,msg:""},
+    {t:"通",c:"btn-warning",ok:true,msg:""}
+]},
+//48
+{tip:"第48关：本关失败3次刷新正确按钮",btns:[
+    {t:"答案A",c:"btn-normal",ok:false,msg:""},
+    {t:"答案B",c:"btn-danger",ok:false,msg:""}
+],levelFailRandomBtn:3},
+//49
+{tip:"第49关：外层文字误导按钮陷阱",btns:[
+    {t:"安全按钮 <span style='font-size:6px'>危险</span>",c:"btn-warning",ok:false,msg:""},
+    {t:"普通按钮 <span style='font-size:6px'>安全</span>",c:"btn-normal",ok:true,msg:""}
+]},
+//50
+{tip:"第50关｜地狱终极最终关：全局总失败≥50次解锁结局",btns:[
+    {t:"开启完美结局",c:"btn-warning",ok:false,msg:""},
+    {t:"查看50关全部闯关折磨记录",c:"btn-normal",ok:true,msg:""}
+],finalHellCheck:50}
+];
+
+function renderLevel(){
+    const data = levelConfig[currentLevel-1];
+    levelShow.textContent = currentLevel;
+    failShow.textContent = failCount;
+    levelTip.innerText = data.tip;
+    btnGroup.innerHTML = '';
+
+    data.btns.forEach(item=>{
+        const btn = document.createElement('button');
+        btn.className = `btn ${item.c}`;
+        btn.innerHTML = item.t;
+        if(item.s) btn.style.cssText = item.s;
+        btn.addEventListener('click',()=>{
+            playAudio(clickAudio);
+            if(!item.ok){
+                failCount++;
+                playAudio(loseAudio);
+                showModal('挑战失败','');
+                modalBtn.onclick = function(){
+                    modal.classList.add('hidden');
+                    renderLevel();
+                }
+            }else{
+                playAudio(winAudio);
+                showModal('闯关成功','');
+                modalBtn.onclick = function(){
+                    modal.classList.add('hidden');
+                    nextLevel();
+                }
+            }
+        })
+        if(data.doubleClickFail){
+            btn.addEventListener('dblclick',()=>{
+                playAudio(loseAudio);
+                failCount++;
+                showModal('挑战失败','');
+                modalBtn.onclick = function(){
+                    modal.classList.add('hidden');
+                    renderLevel();
+                }
+            })
+        }
+        btnGroup.appendChild(btn);
+    })
+}
+
+function showModal(title,text){
+    modalTitle.textContent = title;
+    modalText.textContent = text;
+    modal.classList.remove('hidden');
+}
+
+function nextLevel(){
+    rankData.records.push({level:currentLevel,fail:failCount});
+    rankData.totalFail = failCount;
+    if(currentLevel>rankData.best) rankData.best = currentLevel;
+    saveRankData(rankData);
+    document.getElementById('bestRecord').textContent = rankData.best;
+    document.getElementById('totalFailRecord').textContent = rankData.totalFail;
+    renderRank();
+
+    if(currentLevel < MAX_LEVEL){
+        currentLevel++;
+        renderLevel();
+    }else{
+        showModal('🏆全部通关','');
+    }
+}
+
+window.addEventListener('click',()=>{
+    if(bgmOn && bgmAudio.paused){
+        bgmAudio.play().catch(()=>{});
+    }
+},{once:true})
+
+renderLevel();
+</script>
+</body>
+</html>
